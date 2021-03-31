@@ -1,0 +1,33 @@
+version: "3.9"
+   
+services:
+  db:
+    image: postgres # uses existing image
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=mydb
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=secret
+    networks: 
+      - main
+#      main:
+#        ipv4_address: 172.20.128.2
+  web:
+    build: .
+    image: webapp # creates a new image since it contains the build: command
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    networks: 
+      - main
+networks:
+  main:
+#    ipam:
+#      driver: default
+#      config:
+#        - subnet: 172.28.0.0/16
